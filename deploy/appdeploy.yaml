@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: vivekmt2019137/kubesql:v1
+        image: vivekmt2019137/kubesql:v2
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: "qwertyuiop"
@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
       - name: api-monitor
-        image: vivekmt2019137/kubeapimonitor:v1
+        image: vivekmt2019137/kubeapimonitor:v2
         ports:
         - containerPort: 8585
         livenessProbe:
@@ -80,7 +80,7 @@ spec:
     spec:
       containers:
       - name: api-server
-        image: vivekmt2019137/kubeapiserver:v1
+        image: vivekmt2019137/kubeapiserver:v2
         env:
         - name: username
           value: "iiitbspring"
