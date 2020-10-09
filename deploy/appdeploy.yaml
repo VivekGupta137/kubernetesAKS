@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: db
+      service: db-service
+  template:
+    metadata:
+      labels:
+        type: db
+        service: db-service
+        db: mysql
+    spec:
+      containers:
+      - name: db
+        image: vivekmt2019137/kubesql:v1
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "qwertyuiop"
+        - name: MYSQL_USER
+          value: "iiitbspring"
+        - name: MYSQL_PASSWORD
+          value: "iiitbspring"
+        ports:
+        - containerPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apimonitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: monitor-microservice
+      service: api-monitor-service
+  template:
+    metadata:
+      labels:
+        type: monitor-microservice
+        service: api-monitor-service
+        framework: spring-boot
+    spec:
+      containers:
+      - name: api-monitor
+        image: vivekmt2019137/kubeapimonitor:v1
+        ports:
+        - containerPort: 8585
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8585
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8585
+          periodSeconds: 1
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: server-microservice
+      service: api-server-service
+  template:
+    metadata:
+      labels:
+        type: server-microservice
+        service: api-server-service
+        framework: spring-boot
+    spec:
+      containers:
+      - name: api-server
+        image: vivekmt2019137/kubeapiserver:v1
+        env:
+        - name: username
+          value: "iiitbspring"
+        - name: password
+          value: "iiitbspring"
+        - name: DB_URL
+          value: "jdbc:mysql://db:3306?useSSL=false&serverTimezone=UTC"
+        - name: monitor
+          value: "monitor=http://api-monitor:8585"
+        ports:
+        - containerPort: 8686
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  ports:
+  - port: 3306
+  selector:
+    type: db
+    service: db-service
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-monitor
+spec:
+  type: NodePort
+  ports:
+  - port: 8585
+  selector:
+    type: monitor-microservice
+    service: api-monitor-service
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-server
+spec:
+  type: NodePort
+  ports:
+  - port: 8686
+  selector:
+    type: server-microservice
+    service: api-server-service
