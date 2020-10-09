@@ -3,7 +3,7 @@ version: "3.3"
 services:
   db:
     build:  ./mysql/
-    image: vivekmt2019137/kubesql:v1
+    image: vivekmt2019137/kubesql:v2
     restart: always
     networks:
       - database
@@ -14,7 +14,7 @@ services:
   
   apimonitor:
     build: ./apiMonitor/
-    image: vivekmt2019137/kubeapimonitor:v1
+    image: vivekmt2019137/kubeapimonitor:v2
     networks:
       - api
     # ports:
@@ -24,7 +24,7 @@ services:
 
   apiserver:
     build: ./apiServer/
-    image: vivekmt2019137/kubeapiserver:v1
+    image: vivekmt2019137/kubeapiserver:v2
     depends_on:
       - db
     networks:
@@ -35,8 +35,8 @@ services:
     #   - password=iiitbspring
     #   - DB_URL=jdbc:mysql://db:3306?useSSL=false&serverTimezone=UTC
     #   - monitor=http://apimonitor:8585
-    ports:
-      - "8686:8686"
+    # ports:
+    #   - "8686:8686"
 
 networks:
   database:
