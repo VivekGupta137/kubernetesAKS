@@ -1,0 +1,44 @@
+version: "3.3"
+
+services:
+  db:
+    build:  ./mysql/
+    # image: 
+    restart: always
+    networks:
+      - database
+    environment:
+      - MYSQL_USER=iiitbspring
+      - MYSQL_PASSWORD=iiitbspring
+    # volumes:
+    #   - db-data:/var/lib/mysql
+  
+  apimonitor:
+    build: ./apiMonitor/
+    # image:
+    networks:
+      - api
+    ports:
+      - "8585:8585"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  apiserver:
+    build: ./apiServer/
+    # image:
+    depends_on:
+      - db
+    networks:
+      - database
+      - api
+    environment:
+      - username=iiitbspring
+      - password=iiitbspring
+      - DB_URL=jdbc:mysql://db:3306?useSSL=false&serverTimezone=UTC
+      - monitor=http://apimonitor:8585
+    ports:
+      - "8686:8686"
+
+networks:
+  database:
+  api:
