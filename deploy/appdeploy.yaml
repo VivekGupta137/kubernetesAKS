@@ -87,9 +87,9 @@ spec:
         - name: password
           value: "iiitbspring"
         - name: DB_URL
-          value: "jdbc:mysql://db:3306?useSSL=false&serverTimezone=UTC"
+          value: "jdbc:mysql://db-service:3306?useSSL=false&serverTimezone=UTC"
         - name: monitor
-          value: "monitor=http://api-monitor:8585"
+          value: "http://api-monitor:8585"
         ports:
         - containerPort: 8686
 
@@ -113,7 +113,7 @@ kind: Service
 metadata:
   name: api-monitor
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 8585
   selector:
@@ -127,7 +127,7 @@ kind: Service
 metadata:
   name: api-server
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
   - port: 8686
   selector:
