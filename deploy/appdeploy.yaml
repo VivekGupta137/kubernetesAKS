@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: vivekmt2019137/kubesql:v2
+        image: vivekmt2019137/kubesql:v6
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: "qwertyuiop"
@@ -44,10 +44,14 @@ spec:
         type: monitor-microservice
         service: api-monitor-service
         framework: spring-boot
+        language: java
     spec:
       containers:
       - name: api-monitor
-        image: vivekmt2019137/kubeapimonitor:v2
+        image: vivekmt2019137/kubeapimonitor:v6
+        env:
+        - name: selector
+          value: "framework=spring-boot"
         ports:
         - containerPort: 8585
         livenessProbe:
@@ -77,10 +81,11 @@ spec:
         type: server-microservice
         service: api-server-service
         framework: spring-boot
+        language: java
     spec:
       containers:
       - name: api-server
-        image: vivekmt2019137/kubeapiserver:v2
+        image: vivekmt2019137/kubeapiserver:v6
         env:
         - name: username
           value: "iiitbspring"
@@ -92,6 +97,15 @@ spec:
           value: "http://api-monitor:8585"
         ports:
         - containerPort: 8686
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8686
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8686
+          periodSeconds: 1
 
 ---
 
